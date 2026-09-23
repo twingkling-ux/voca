@@ -32,18 +32,7 @@
 
             // 1. 구글 시트 데이터 가져오기 (본인의 GAS URL로 교체하세요)
             const GAS_URL = "https://script.google.com/macros/s/AKfycbxyfSxRP-CURj5K4DF_OPlIZzE568grGfkwcyulU6O6InyjHOR5k1NI5q23Qawq4-ts2Q/exec";
-
-            useEffect(() => {
-                // 테스트용 임시 데이터 (시트 연결 전 확인용)
-                const dummyData = [
-                    { word: 'Apple', meaning: '사과', initialSound: 'ㅅㄱ', easyExample: 'I eat an apple.' },
-                    { word: 'Banana', meaning: '바나나', initialSound: 'ㅂㄴㄴ', easyExample: 'Monkey likes banana.' },
-                    { word: 'Carrot', meaning: '당근', initialSound: 'ㄷㄱ', easyExample: 'Rabbit eats carrot.' }
-                ];
-                setVocabData(dummyData);
-            }, []);
-
-            const speak = (text) => {
+              const speak = (text) => {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
                 window.speechSynthesis.speak(utterance);
