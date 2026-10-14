@@ -1,0 +1,1 @@
+{"name":"root-alchemy-firebase","version":"3.0.0","private":true,"type":"module","engines":{"node":">=22"},"dependencies":{"firebase-admin":"14.5.0"},"scripts":{"build":"node scripts/build.mjs","test":"node --test tests/*.test.mjs","dev":"node scripts/dev.mjs","grant:teacher":"node scripts/grant-teacher.mjs"}}

@@ -1,0 +1,3 @@
+import {firebase} from '../server/firebase.js';
+const index=process.argv.indexOf('--email'),email=index>=0?process.argv[index+1]:null;if(!email||!/^\S+@\S+\.\S+$/.test(email))throw Error('Usage: npm run grant:teacher -- --email teacher@example.com');
+const {auth}=await firebase(),user=await auth.getUserByEmail(email);if(!user.emailVerified)throw Error('Teacher must confirm ownership of this email address first. Use the verification button on /admin.');await auth.setCustomUserClaims(user.uid,{...user.customClaims,teacher:true});console.log('Teacher role granted. Sign in again or refresh permissions on /admin.');

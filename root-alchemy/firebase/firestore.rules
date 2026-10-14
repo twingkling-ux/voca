@@ -1,0 +1,8 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  // All app data is read/written by the authenticated Vercel API using Admin SDK.
+  // Client SDKs cannot grant roles, read classmates, or alter experience points.
+  match /{document=**} { allow read, write: if false; }
+ }
+}

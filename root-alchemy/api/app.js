@@ -1,0 +1,10 @@
+import {checkOrigin,fail} from '../server/validation.js';
+import {firebase,identity,webConfig} from '../server/firebase.js';
+import {Repository} from '../server/repository.js';
+export function createHandler(getServices=firebase){return async function handler(req,res){res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');const send=(data,status=200)=>res.status(status).json(data);try{const action=new URL(req.url,'http://localhost').searchParams.get('action')||'bootstrap';if(!['GET','POST'].includes(req.method))fail(405,'지원되지 않는 요청입니다.');if(req.method==='POST')checkOrigin(req);const post=()=>{if(req.method!=='POST')fail(405,'POST 요청이 필요합니다.')};let body=req.body||{};if(typeof body==='string'){if(Buffer.byteLength(body)>120000)fail(413,'입력 데이터가 너무 큽니다.');try{body=JSON.parse(body)}catch{fail(400,'JSON 형식이 올바르지 않습니다.')}}if(!body||typeof body!=='object'||Array.isArray(body)||Buffer.byteLength(JSON.stringify(body))>120000)fail(400,'입력 형식이 올바르지 않습니다.');if(action==='config')return send({firebase: webConfig()});if(!req.headers.authorization)fail(401,'이메일과 비밀번호로 로그인하세요.');const {auth,db}=await getServices(),user=await identity(req,auth),repo=new Repository(db);
+if(action==='bootstrap')return send(await repo.snapshot(user));
+if(action==='challenge'){post();return send(await repo.start(user,body))}
+if(action==='attempt'){post();const result=await repo.submit(user,body);return send({result,...await repo.snapshot(user)})}
+if(action.startsWith('admin-')){if(!user.teacher)fail(403,'교사 권한이 있는 인증 계정만 사용할 수 있습니다.');if(action==='admin-list')return send(await repo.list());if(action==='admin-students')return send(await repo.students());if(action==='admin-save'){post();return send(await repo.save(body))}if(action==='admin-import'){post();return send(await repo.import(body))}if(action==='admin-publish'){post();return send(await repo.publish(body))}}
+fail(404,'요청을 찾을 수 없습니다.');}catch(e){return send({error:e.status?e.message:'요청을 처리하지 못했습니다. Firebase 연결 설정을 확인하세요.'},e.status||500)}}}
+export default createHandler();
